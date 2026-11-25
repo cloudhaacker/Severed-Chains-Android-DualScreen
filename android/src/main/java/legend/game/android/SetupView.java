@@ -533,20 +533,6 @@ public final class SetupView extends ScrollView {
       intent.putExtra(android.provider.DocumentsContract.EXTRA_INITIAL_URI, sdRoot);
     }
 
-    // ...and on the lower screen when setup is showing there. Some devices
-    // refuse to launch the system picker on a second display; fall back to
-    // the main screen then.
-    if(DualScreen.available()) {
-      try {
-        final android.app.ActivityOptions options = android.app.ActivityOptions.makeBasic();
-        options.setLaunchDisplayId(DualScreen.displayId());
-        this.activity.startActivityForResult(intent, PICK_ISOS, options.toBundle());
-        return;
-      } catch(final RuntimeException e) {
-        Log.w("SetupView", "picker refused on lower screen, using main screen", e);
-      }
-    }
-
     this.activity.startActivityForResult(intent, PICK_ISOS);
   }
 

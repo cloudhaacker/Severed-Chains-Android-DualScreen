@@ -35,7 +35,6 @@ public final class DualScreen {
   private static FrameLayout host;
   private static Function<Context, View> factory;
   private static boolean focusable;
-  private static Runnable onLost;
 
   private DualScreen() { }
 
@@ -51,7 +50,6 @@ public final class DualScreen {
       Log.i(TAG, "display removed: " + displayId);
       if(presentation != null && presentation.getDisplay().getDisplayId() == displayId) {
         dismiss();
-        notifyLost();
       }
     }
 
@@ -76,7 +74,6 @@ public final class DualScreen {
     if(displayManager != null) {
       displayManager.unregisterDisplayListener(LISTENER);
     }
-    onLost = null;
     dismiss();
     factory = null;
     activity = null;
@@ -105,26 +102,6 @@ public final class DualScreen {
       attachContent();
     } else if(activity != null) {
       activity.getWindow().getDecorView().post(DualScreen::ensurePresentation);
-    }
-  }
-
-  /** True when the device reports a second screen, even before our window is up. */
-  public static boolean hasLowerDisplay() {
-    return findLowerDisplay() != null;
-  }
-
-  /**
-   * Runs if the lower screen goes away or refuses our window, so the caller
-   * can move whatever it put there back onto the main screen.
-   */
-  public static void setOnLost(final Runnable callback) {
-    onLost = callback;
-  }
-
-  private static void notifyLost() {
-    final Runnable r = onLost;
-    if(r != null) {
-      r.run();
     }
   }
 
@@ -184,7 +161,6 @@ public final class DualScreen {
       p.show();
     } catch(final RuntimeException e) {
       Log.w(TAG, "couldn't show on display " + display.getDisplayId(), e);
-      notifyLost();
       return;
     }
 

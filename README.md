@@ -1,7 +1,7 @@
 # Severed Chains Android — Dual Screen
 
 > [!NOTE]
-> **Dual Screen fork, work in progress.** This fork of [dracinn's Severed Chains Android](https://github.com/dracinn/Severed-Chains-Android) adds support for dual-screen handhelds such as the Ayn Thor: the game plays on the top screen while the lower screen shows live party status, and first-run disc setup happens on the lower screen.
+> **Dual Screen fork, work in progress.** This fork of [dracinn's Severed Chains Android](https://github.com/dracinn/Severed-Chains-Android) adds support for dual-screen handhelds such as the Ayn Thor: the game plays on the top screen while the lower screen shows live party status. Once installed, the app opens to a simple start menu instead of the disc setup screen.
 >
 > **About AI use:** the dual-screen features are designed and tested by John (cloudhaacker) on his Ayn Thor, and the code is written by Claude, an AI assistant made by Anthropic. Everything else — the Android port and the Severed Chains engine — is the work of their original authors. This fork installs as its own app ("Severed Chains DS") alongside the original. Please report dual-screen issues here, not to dracinn or upstream.
 

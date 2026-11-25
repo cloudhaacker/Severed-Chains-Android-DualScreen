@@ -193,7 +193,7 @@ public final class MainActivity extends Activity {
     // before the engine starts. -e force_setup 1 reopens the screen to
     // manage discs on an unpacked install.
     if(this.isUnpacked() && !this.getIntent().getBooleanExtra("force_setup", false)) {
-      this.showGame();
+      this.showLaunchMenu();
     } else {
       this.showSetup();
     }
@@ -285,57 +285,28 @@ public final class MainActivity extends Activity {
   }
 
   void showSetup() {
-    final File isosDir = new File(this.getFilesDir(), "isos");
-
-    // Dual Screen fork: disc setup goes on the lower screen, with a title
-    // card on top. If the lower screen turns out to be unusable, fall back
-    // to the normal single-screen setup.
-    if(DualScreen.hasLowerDisplay()) {
-      this.setContentView(this.makeSetupSplash());
-      DualScreen.setOnLost(() -> {
-        if(!this.gameUi) {
-          this.showSetupOnMainScreen(isosDir);
-        }
-      });
-      DualScreen.setContent(ctx -> {
-        this.setupView = new SetupView(ctx, this, isosDir, this::showGame);
-        return this.setupView;
-      }, true);
-      return;
-    }
-
-    this.showSetupOnMainScreen(isosDir);
-  }
-
-  private void showSetupOnMainScreen(final File isosDir) {
-    DualScreen.setOnLost(null);
+    // Disc setup stays on the main screen: the system file picker always
+    // opens there, and splitting them across screens hid the picker.
     DualScreen.clearContent();
-    this.setupView = new SetupView(this, isosDir, this::showGame);
+    this.setupView = new SetupView(this, new File(this.getFilesDir(), "isos"), this::showGame);
     this.setContentView(this.setupView);
   }
 
-  /** Dual Screen fork: top-screen title card shown while setup runs below. */
-  private android.view.View makeSetupSplash() {
-    final android.widget.TextView text = new android.widget.TextView(this);
-    text.setGravity(Gravity.CENTER);
-    text.setTextColor(0xfff2e8d5);
-    text.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 18);
-    text.setTypeface(android.graphics.Typeface.SERIF);
-    text.setLineSpacing(0, 1.3f);
-    text.setText("SEVERED CHAINS\nDual Screen\n\nSet up your discs on the lower screen \u25BC");
-    text.setBackground(new android.graphics.drawable.GradientDrawable(
-      android.graphics.drawable.GradientDrawable.Orientation.TOP_BOTTOM,
-      new int[] {0xff151210, 0xff302a24}));
-    return text;
+  /** Dual Screen fork: start menu shown on launch once the game is installed. */
+  private void showLaunchMenu() {
+    this.setContentView(new LaunchView(this, this::showGame, this::showSetup));
+    DualScreen.setContent(PartyPanelView::new, false);
   }
 
   private void showGame() {
+    if(this.gameUi) {
+      return; // Already started (e.g. Start pressed twice)
+    }
     this.setupView = null;
     this.gameUi = true;
 
     // Dual Screen fork: party status on the lower screen. It never takes key
     // focus, so the controller keeps driving the game up top.
-    DualScreen.setOnLost(null);
     DualScreen.setContent(PartyPanelView::new, false);
 
     this.surfaceView = new SurfaceView(this);
