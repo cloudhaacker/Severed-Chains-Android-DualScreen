@@ -9,7 +9,7 @@ import android.graphics.Shader;
 import android.graphics.Typeface;
 import android.view.View;
 import legend.game.characters.VitalsStat;
-import legend.game.types.CharacterData2c;
+import legend.game.characters.CharacterData2c;
 import legend.game.types.GameState52c;
 import legend.lodmod.LodMod;
 
