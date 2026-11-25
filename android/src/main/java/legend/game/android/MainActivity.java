@@ -523,6 +523,11 @@ public final class MainActivity extends Activity {
   protected void onPause() {
     super.onPause();
     AL10.pauseAll();
+    // Dual Screen fork: any way out of the app (quit, back, swipe away)
+    // closes the lower-screen window with it
+    if(this.isFinishing()) {
+      DualScreen.release();
+    }
   }
 
   @Override

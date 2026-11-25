@@ -61,26 +61,25 @@ public final class CreditsPanelView extends View {
   }
 
   private void build(final Context context) {
-    this.add(Kind.TITLE, "With thanks");
-    this.add(Kind.GAP, null);
-
-    this.add(Kind.HEADING, "Severed Chains Dual Screen");
-    this.add(Kind.NAME, "John (cloudhaacker)");
-    this.add(Kind.NOTE, "Ideas, design and testing");
-    this.add(Kind.NAME, "Claude, an AI by Anthropic");
-    this.add(Kind.NOTE, "Code");
-    this.add(Kind.GAP, null);
-
-    this.add(Kind.HEADING, "Android Port");
-    this.add(Kind.NAME, "dracinn");
-    this.add(Kind.GAP, null);
-
     this.add(Kind.TITLE, "Severed Chains");
     this.add(Kind.GAP, null);
     this.readUpstreamCredits(context);
 
+    this.add(Kind.TITLE, "Android Port");
+    this.add(Kind.NAME, "dracinn");
+    this.add(Kind.GAP, null);
+    this.add(Kind.GAP, null);
+
     this.add(Kind.TITLE, "The Legend of Dragoon");
     this.add(Kind.NOTE, "Sony Computer Entertainment, 1999");
+    this.add(Kind.GAP, null);
+    this.add(Kind.GAP, null);
+
+    this.add(Kind.TITLE, "Dual Screen");
+    this.add(Kind.NAME, "John (cloudhaacker)");
+    this.add(Kind.NOTE, "Ideas, design and testing");
+    this.add(Kind.NAME, "Claude, an AI by Anthropic");
+    this.add(Kind.NOTE, "Code");
     this.add(Kind.GAP, null);
     this.add(Kind.GAP, null);
   }

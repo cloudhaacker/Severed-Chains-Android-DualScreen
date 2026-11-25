@@ -59,6 +59,9 @@ public final class PartyPanelView extends View {
   private static final float ENCOUNTER_WARN = 0xa00;
   private static final float ENCOUNTER_DANGER = 0xf00;
 
+  /** Width of one menu pixel relative to its height: 320 / 368. */
+  private static final float PIXEL_ASPECT = 320f / 368f;
+
   // Matches the port's dark-glass-and-gold controls
   private static final int BG_TOP = 0xff151210;
   private static final int BG_BOTTOM = 0xff302a24;
@@ -361,16 +364,19 @@ public final class PartyPanelView extends View {
     // Portrait in a gold frame, as tall as the card allows
     final Bitmap face = this.portrait(m.id);
     if(face != null) {
+      // The game draws its menus 368 wide on a 4:3 screen, so its pixels are
+      // narrower than they are tall; match that instead of a square
       final float size = Math.min(this.dp(72), b - t - inner * 2);
+      final float faceW = size * PIXEL_ASPECT;
       final float py = t + (b - t - size) / 2f;
-      this.rect.set(x, py, x + size, py + size);
+      this.rect.set(x, py, x + faceW, py + size);
       canvas.drawBitmap(face, null, this.rect, this.pixelPaint);
       this.paint.setStyle(Paint.Style.STROKE);
       this.paint.setStrokeWidth(this.dp(2));
       this.paint.setColor(GOLD);
       canvas.drawRect(this.rect, this.paint);
       this.paint.setStyle(Paint.Style.FILL);
-      x += size + inner;
+      x += faceW + inner;
     }
 
     // Name + levels

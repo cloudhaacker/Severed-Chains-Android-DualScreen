@@ -291,7 +291,12 @@ public final class AndroidEnv {
   private static void quitToLauncher() {
     final android.app.Activity act = activity;
     if(act != null) {
-      act.runOnUiThread(act::finishAndRemoveTask);
+      act.runOnUiThread(() -> {
+        // Dual Screen fork: close the lower-screen window too, or it stays
+        // up after the game quits
+        DualScreen.release();
+        act.finishAndRemoveTask();
+      });
     }
   }
 
