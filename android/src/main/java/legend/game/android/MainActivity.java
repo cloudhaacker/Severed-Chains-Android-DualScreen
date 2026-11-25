@@ -49,6 +49,9 @@ public final class MainActivity extends Activity {
   protected void onCreate(final Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
+    // Dual Screen fork: look for a lower screen (Ayn Thor etc.)
+    DualScreen.init(this);
+
     // Keep the screen on and visible above the keyguard while running
     if(android.os.Build.VERSION.SDK_INT >= 27) {
       this.setShowWhenLocked(true);
@@ -282,13 +285,58 @@ public final class MainActivity extends Activity {
   }
 
   void showSetup() {
-    this.setupView = new SetupView(this, new File(this.getFilesDir(), "isos"), this::showGame);
+    final File isosDir = new File(this.getFilesDir(), "isos");
+
+    // Dual Screen fork: disc setup goes on the lower screen, with a title
+    // card on top. If the lower screen turns out to be unusable, fall back
+    // to the normal single-screen setup.
+    if(DualScreen.hasLowerDisplay()) {
+      this.setContentView(this.makeSetupSplash());
+      DualScreen.setOnLost(() -> {
+        if(!this.gameUi) {
+          this.showSetupOnMainScreen(isosDir);
+        }
+      });
+      DualScreen.setContent(ctx -> {
+        this.setupView = new SetupView(ctx, this, isosDir, this::showGame);
+        return this.setupView;
+      }, true);
+      return;
+    }
+
+    this.showSetupOnMainScreen(isosDir);
+  }
+
+  private void showSetupOnMainScreen(final File isosDir) {
+    DualScreen.setOnLost(null);
+    DualScreen.clearContent();
+    this.setupView = new SetupView(this, isosDir, this::showGame);
     this.setContentView(this.setupView);
+  }
+
+  /** Dual Screen fork: top-screen title card shown while setup runs below. */
+  private android.view.View makeSetupSplash() {
+    final android.widget.TextView text = new android.widget.TextView(this);
+    text.setGravity(Gravity.CENTER);
+    text.setTextColor(0xfff2e8d5);
+    text.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 18);
+    text.setTypeface(android.graphics.Typeface.SERIF);
+    text.setLineSpacing(0, 1.3f);
+    text.setText("SEVERED CHAINS\nDual Screen\n\nSet up your discs on the lower screen \u25BC");
+    text.setBackground(new android.graphics.drawable.GradientDrawable(
+      android.graphics.drawable.GradientDrawable.Orientation.TOP_BOTTOM,
+      new int[] {0xff151210, 0xff302a24}));
+    return text;
   }
 
   private void showGame() {
     this.setupView = null;
     this.gameUi = true;
+
+    // Dual Screen fork: party status on the lower screen. It never takes key
+    // focus, so the controller keeps driving the game up top.
+    DualScreen.setOnLost(null);
+    DualScreen.setContent(PartyPanelView::new, false);
 
     this.surfaceView = new SurfaceView(this);
     this.touchControls = new TouchControlsView(this);
@@ -510,6 +558,12 @@ public final class MainActivity extends Activity {
   protected void onResume() {
     super.onResume();
     AL10.resumeAll();
+  }
+
+  @Override
+  protected void onDestroy() {
+    DualScreen.release();
+    super.onDestroy();
   }
 
   @Override

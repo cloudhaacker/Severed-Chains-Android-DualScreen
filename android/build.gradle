@@ -47,7 +47,7 @@ android {
   compileSdk = 37
 
   defaultConfig {
-    applicationId = 'com.legendofdragoon.severedchains'
+    applicationId = 'com.legendofdragoon.severedchains.dualscreen'
     minSdk = 26
     targetSdk = 37
     versionCode = buildVersionCode

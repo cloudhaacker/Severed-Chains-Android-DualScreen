@@ -95,7 +95,16 @@ public final class SetupView extends ScrollView {
   };
 
   public SetupView(final Activity activity, final File isosDir, final Runnable onStart) {
-    super(activity);
+    this(activity, activity, isosDir, onStart);
+  }
+
+  /**
+   * Dual Screen fork: {@code viewContext} is the context the view is drawn
+   * with (the lower screen's, when setup shows there); {@code activity} is
+   * still used to launch the file picker and permission screens.
+   */
+  public SetupView(final android.content.Context viewContext, final Activity activity, final File isosDir, final Runnable onStart) {
+    super(viewContext);
     this.activity = activity;
     this.isosDir = isosDir;
     this.onStart = onStart;
@@ -516,7 +525,47 @@ public final class SetupView extends ScrollView {
       .addCategory(Intent.CATEGORY_OPENABLE)
       .setType("*/*")
       .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+
+    // Dual Screen fork: open the picker on the SD card when there is one,
+    // since that's where most handheld users keep their disc images
+    final Uri sdRoot = this.sdCardRoot();
+    if(sdRoot != null) {
+      intent.putExtra(android.provider.DocumentsContract.EXTRA_INITIAL_URI, sdRoot);
+    }
+
+    // ...and on the lower screen when setup is showing there. Some devices
+    // refuse to launch the system picker on a second display; fall back to
+    // the main screen then.
+    if(DualScreen.available()) {
+      try {
+        final android.app.ActivityOptions options = android.app.ActivityOptions.makeBasic();
+        options.setLaunchDisplayId(DualScreen.displayId());
+        this.activity.startActivityForResult(intent, PICK_ISOS, options.toBundle());
+        return;
+      } catch(final RuntimeException e) {
+        Log.w("SetupView", "picker refused on lower screen, using main screen", e);
+      }
+    }
+
     this.activity.startActivityForResult(intent, PICK_ISOS);
+  }
+
+  /** Document URI for the root of the first removable SD card, or null. */
+  private Uri sdCardRoot() {
+    try {
+      final android.os.storage.StorageManager sm = this.activity.getSystemService(android.os.storage.StorageManager.class);
+      if(sm == null) {
+        return null;
+      }
+      for(final android.os.storage.StorageVolume v : sm.getStorageVolumes()) {
+        if(v.isRemovable() && v.getUuid() != null) {
+          return android.provider.DocumentsContract.buildDocumentUri("com.android.externalstorage.documents", v.getUuid() + ":");
+        }
+      }
+    } catch(final RuntimeException e) {
+      Log.w("SetupView", "couldn't find SD card", e);
+    }
+    return null;
   }
 
   /** Called from MainActivity.onActivityResult while this view is showing. */
