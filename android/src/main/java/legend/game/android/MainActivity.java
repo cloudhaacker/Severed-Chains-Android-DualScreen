@@ -287,7 +287,7 @@ public final class MainActivity extends Activity {
   void showSetup() {
     // Disc setup stays on the main screen: the system file picker always
     // opens there, and splitting them across screens hid the picker.
-    DualScreen.clearContent();
+    DualScreen.setContent(CreditsPanelView::new, false);
     this.setupView = new SetupView(this, new File(this.getFilesDir(), "isos"), this::showGame);
     this.setContentView(this.setupView);
   }
@@ -295,7 +295,7 @@ public final class MainActivity extends Activity {
   /** Dual Screen fork: start menu shown on launch once the game is installed. */
   private void showLaunchMenu() {
     this.setContentView(new LaunchView(this, this::showGame, this::showSetup));
-    DualScreen.setContent(PartyPanelView::new, false);
+    DualScreen.setContent(CreditsPanelView::new, false);
   }
 
   private void showGame() {

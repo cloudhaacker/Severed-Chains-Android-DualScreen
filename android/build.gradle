@@ -1556,6 +1556,8 @@ tasks.register('stageAssets', Copy) {
       }
     }
   }
+  // Dual Screen fork: upstream credits, shown on the lower screen
+  from('../credits.txt')
   // Unpacker patch data (replacements, scripts, libs) read via Path.of
   from('../patches') {
     into 'patches'
